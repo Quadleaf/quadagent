@@ -36,11 +36,22 @@ Real secrets live only in the (gitignored) `.env` and in your live `~/.claude/`.
 
 ## Install
 
-Symlink this repo's files into `~/.claude/` (backs up anything already there):
+Symlink this repo's files into `~/.claude/`, making the repo canonical:
 
 ```bash
-./install.sh   # planned — not yet added
+./install.sh              # back up any existing copies, then symlink
+./install.sh --dry-run    # preview every action without changing anything
 ```
+
+For each file in the script's `MIRRORS` manifest, `install.sh` replaces the live
+copy under `~/.claude/` with a symlink into this repo. Anything already present
+that is *not* already the correct symlink is first moved to
+`~/.claude/.quad-agent-backups/<timestamp>/`, so nothing is lost. The script is
+idempotent — re-running reports `OK ... already linked` and makes no changes.
+
+The target config dir can be overridden with `CLAUDE_CONFIG_DIR` (default
+`~/.claude`). As skills, hooks, and sanitized `settings.json` / `.mcp.json` get
+committed, add their repo-relative paths to `MIRRORS` in `install.sh`.
 
 ## Layout note
 
