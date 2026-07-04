@@ -8,6 +8,12 @@ Cross-project defaults for how I work. Preferences, not hard rules - use judgmen
   is genuinely warranted, call it out and explain the tradeoff instead of taking
   it silently.
 
+## Testing
+- Prefer end-to-end testing that drives the real app (Playwright or Chrome MCP)
+  over assuming unit tests are sufficient. Unit tests verify pieces in isolation;
+  they don't prove the feature actually works for a user. When a change has a
+  runtime surface, exercise the real flow end-to-end before calling it done.
+
 ## Writing style
 - Don't use em dashes. Use a regular dash (-) instead.
 
