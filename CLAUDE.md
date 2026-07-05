@@ -8,6 +8,12 @@ Cross-project defaults for how I work. Preferences, not hard rules - use judgmen
   is genuinely warranted, call it out and explain the tradeoff instead of taking
   it silently.
 
+## Code review
+- Perform an adversarial self-review before pushing a PR. Re-read the diff trying
+  to break it, not to confirm it works: hunt for edge cases, missing error
+  handling, security issues, and regressions. Fix what you find (or call it out)
+  before opening the PR rather than leaving it for reviewers to catch.
+
 ## Testing
 - Prefer end-to-end testing that drives the real app (Playwright or Chrome MCP)
   over assuming unit tests are sufficient. Unit tests verify pieces in isolation;
