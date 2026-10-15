@@ -12,8 +12,30 @@ the pieces of `~/.claude/` that are hand-authored and worth keeping in git
 | `CLAUDE.md` | `~/.claude/CLAUDE.md` | Global memory / cross-project preferences |
 | `skills/product-marketing-cut/` | `~/.claude/skills/product-marketing-cut` | Skill: product marketing videos and screenshots from a live web app (Playwright frame-exact capture + Revideo edit) |
 | `AGENTS.md` | — | Symlink → `CLAUDE.md` so other agent tools that read `AGENTS.md` get the same instructions |
+| `skills/task-worker/` | `~/.claude/skills/task-worker` | Claim a ticket in a session and report status to the Tasks control plane |
+| `skills/task-board/` | `~/.claude/skills/task-board` | Supervising view: what every worker session is doing |
 
-_More files (skills, hooks, sanitized `settings.json` / `.mcp.json`) will be added incrementally._
+_More files (hooks, sanitized `settings.json` / `.mcp.json`) will be added incrementally._
+
+## Tasks control plane
+
+`task-worker` and `task-board` are two halves of one thing: a filesystem control plane between
+a **main session** that supervises and N **worker sessions** that each own a single ticket.
+
+- In a fresh session: `/task-worker BT-10298` — runs the normal ticket kickoff, then keeps
+  `Tasks/<TICKET>/state.json` current for the life of the session.
+- In the main session: `/task-board` — reads every task folder and reports what needs a human.
+
+The **skills are global** (here, mirrored into `~/.claude/`); the **data is per workspace**
+(`Tasks/` beside the repos being worked), because tickets belong to a codebase.
+
+The schema, the single-writer rule and the liveness semantics live in
+[`skills/task-worker/CONTRACT.md`](skills/task-worker/CONTRACT.md). Read that before changing
+either skill — in particular the reason a stale heartbeat must not be read as a dead session.
+
+Ticket kickoff currently delegates to the Bluetail-specific `work-ticket` skill. That step is
+the one place the control plane is not project-agnostic; swapping it is how this gets used on
+another codebase.
 
 ## Source of truth
 

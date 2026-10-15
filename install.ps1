@@ -34,6 +34,8 @@ $ConfigDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-
 $Mirrors = @(
   'CLAUDE.md'
   'skills/product-marketing-cut'
+  'skills/task-worker'
+  'skills/task-board'
 )
 
 # --- helpers ------------------------------------------------------------------

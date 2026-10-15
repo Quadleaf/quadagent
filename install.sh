@@ -37,6 +37,8 @@ DRY_RUN=0
 MIRRORS=(
   "CLAUDE.md"
   "skills/product-marketing-cut"
+  "skills/task-worker"
+  "skills/task-board"
 )
 
 # --- helpers ------------------------------------------------------------------
