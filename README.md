@@ -10,6 +10,7 @@ the pieces of `~/.claude/` that are hand-authored and worth keeping in git
 | Path | Mirrors | Purpose |
 |------|---------|---------|
 | `CLAUDE.md` | `~/.claude/CLAUDE.md` | Global memory / cross-project preferences |
+| `skills/product-marketing-cut/` | `~/.claude/skills/product-marketing-cut` | Skill: product marketing videos and screenshots from a live web app (Playwright frame-exact capture + Revideo edit) |
 | `AGENTS.md` | — | Symlink → `CLAUDE.md` so other agent tools that read `AGENTS.md` get the same instructions |
 
 _More files (skills, hooks, sanitized `settings.json` / `.mcp.json`) will be added incrementally._

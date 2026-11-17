@@ -1,0 +1,7 @@
+node_modules/
+raw/
+out/
+.auth/
+public/footage/
+*.log
+.DS_Store

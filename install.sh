@@ -36,6 +36,7 @@ DRY_RUN=0
 # --- relative path. Add skills/hooks/settings here as they get committed.  -----
 MIRRORS=(
   "CLAUDE.md"
+  "skills/product-marketing-cut"
 )
 
 # --- helpers ------------------------------------------------------------------

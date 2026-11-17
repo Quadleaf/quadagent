@@ -1,0 +1,27 @@
+{
+  "name": "product-teaser",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "login": "tsx capture/login.ts",
+    "capture": "tsx capture/record.ts",
+    "editor": "revideo editor --projectFile ./src/project.ts",
+    "render": "tsx render.ts",
+    "stills": "tsx render.ts --stills",
+    "script": "tsx tools/script.ts"
+  },
+  "devDependencies": {
+    "@revideo/2d": "0.11.0",
+    "@revideo/cli": "0.11.0",
+    "@revideo/core": "0.11.0",
+    "@revideo/ffmpeg": "0.11.0",
+    "@revideo/renderer": "0.11.0",
+    "@revideo/ui": "0.11.0",
+    "@revideo/vite-plugin": "0.11.0",
+    "@types/node": "24.10.1",
+    "playwright": "1.61.1",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3"
+  }
+}

@@ -33,6 +33,7 @@ $ConfigDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-
 # --- relative path. Keep in sync with MIRRORS in install.sh. ------------------
 $Mirrors = @(
   'CLAUDE.md'
+  'skills/product-marketing-cut'
 )
 
 # --- helpers ------------------------------------------------------------------
