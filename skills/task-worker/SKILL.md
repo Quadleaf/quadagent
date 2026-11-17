@@ -38,6 +38,10 @@ Per `CONTRACT.md`: `$QUADAGENT_TASKS_DIR`, else the nearest `Tasks/` walking up 
 
 `Tasks/<TICKET>/`. If it already exists, read `state.json` first and decide:
 
+- `session_state` is `unclaimed` -> **the expected path for queued work.** The main session
+  already created this folder with the ticket title and any queuing notes. Claim it: keep
+  `title` and `notes.md`, set `session_state: "active"`, stamp `pid`, `started` and `heartbeat`.
+  Do not discard what the queuer wrote - it is often the reason this ticket was picked.
 - `session_state` is `finished` -> this is a re-open. Append to `notes.md`, reset state, continue.
 - heartbeat is stale and `session_state` is `active` -> the previous owner probably died. Take
   over, and note the takeover in `notes.md` with the stale timestamp.

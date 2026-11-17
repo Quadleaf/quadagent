@@ -95,10 +95,15 @@ this - concurrent appends from multiple Claude sessions will interleave and corr
 
 | Value | Means |
 |---|---|
+| `unclaimed` | Queued by the main session. **No worker session exists yet.** `pid` and `heartbeat` are `null`. |
 | `active` | The session is working. Heartbeat should be recent. |
 | `awaiting-input` | Deliberately paused, waiting on a human answer. `question` is set. |
 | `idle` | Kickoff done, nothing in flight, session still open. |
 | `finished` | Work concluded and the session is done with this ticket. |
+
+`unclaimed` and `idle` must never be conflated. `idle` is a live session with nothing in
+flight; `unclaimed` is work nobody has started. They need opposite things from a human - one
+wants leaving alone, the other wants a session opened.
 
 ---
 
@@ -117,6 +122,7 @@ after. Going quiet to ask a question means writing `awaiting-input` *first*. The
 
 | Observed | Interpretation |
 |---|---|
+| `session_state` = `unclaimed`, no heartbeat at all | queued, never started - expected |
 | heartbeat fresh (< 5 min) | genuinely active |
 | heartbeat stale, `session_state` = `awaiting-input` / `idle` / `finished` | expected, not a problem |
 | heartbeat stale (> 30 min), `session_state` = `active` | **suspect** - the session likely died mid-step |

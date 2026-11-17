@@ -3,9 +3,9 @@ name: task-board
 description: >
   Show what every worker session is doing right now, from the Tasks control plane on disk.
   Use when the user asks "what's running", "status of my tickets", "the board", "what are
-  my sessions doing", "anything blocked", "check on BT-XXXX", or wants to send an
-  instruction to a session already working a ticket. Read-only except for replying into a
-  worker's inbox.
+  my sessions doing", "anything blocked", "check on BT-XXXX", wants to send an instruction
+  to a session already working a ticket, or wants to queue tickets for worker sessions to
+  pick up later. Never does ticket work itself and never writes a worker's own status files.
 allowed-tools: Bash, Read, Write, Glob, Grep
 ---
 
@@ -21,10 +21,11 @@ dead session.
 ## Usage
 
 ```
-/task-board                        # the board
-/task-board BT-10298               # one ticket, with its notes
-/task-board --reply BT-10298       # append an instruction to that worker's inbox
-/task-board --prune                # list finished folders and offer to archive them
+/task-board                             # the board
+/task-board BT-10298                    # one ticket, with its notes
+/task-board --reply BT-10298            # append an instruction to that worker's inbox
+/task-board --queue BT-10237 BT-10212   # queue tickets for worker sessions to claim
+/task-board --prune                     # list finished folders and offer to archive them
 ```
 
 ## Step 1 - read the plane
@@ -41,6 +42,7 @@ Per the contract, combine heartbeat age with `session_state`. Never report on ag
 
 | Classification | Condition |
 |---|---|
+| **queued** | `session_state: unclaimed` - no worker session exists yet |
 | **active** | heartbeat < 5 min, `session_state: active` |
 | **waiting** | `session_state: awaiting-input` - needs a human answer |
 | **blocked** | `work_status: Blocked` |
@@ -55,8 +57,8 @@ Treat `pid` as corroboration, never as the deciding signal - the contract explai
 
 Sort by what needs a human, not alphabetically:
 
-**waiting** and **blocked** first, then **suspect** / **gone**, then **active**, then **idle**,
-then **done**.
+**waiting** and **blocked** first, then **suspect** / **gone**, then **active**, then **queued**,
+then **idle**, then **done**.
 
 ```
 TICKET      STATUS        SESSION         LAST     ACTIVITY
@@ -77,7 +79,25 @@ Then, below the table, spell out only the rows that need action:
 
 If the plane is empty, say so in one line. Do not invent structure that is not there.
 
-## Step 4 - replying to a worker
+## Step 4 - queueing work
+
+`--queue <TICKET>...` creates folders for tickets that nobody is working yet, so a worker
+session can claim one later with `/task-worker <TICKET>`.
+
+For each ticket: fetch the summary from Jira (so the board is readable without opening Jira),
+then write `state.json` with `work_status: "Todo"`, `session_state: "unclaimed"`, and `pid`,
+`heartbeat`, `started` all `null`. Seed `notes.md` with **why this was queued** - the evidence
+or reasoning that made it worth picking. That note is the handover; a worker claiming the
+folder keeps it.
+
+Do **not** run the ticket kickoff here. No worktree, no branch, no deps. Queueing is a decision
+record, not a start - the worker session does the kickoff when it claims the folder, in the
+session that will actually do the work.
+
+Refuse to queue a ticket whose folder already exists in any state other than `finished`, and
+say which state it is in. Re-queuing over live work destroys it.
+
+## Step 5 - replying to a worker
 
 `--reply <TICKET>` appends a numbered, timestamped message to `Tasks/<TICKET>/inbox.md` per the
 contract. Only ever write `inbox.md`; `state.json` and `notes.md` belong to the worker.
