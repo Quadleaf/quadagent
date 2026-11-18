@@ -11,7 +11,8 @@
    (`VARIANTS=soon` for one) plus review stills in `stills/<variant>/`.
 6. `npm run script`: shot table and VO cues for `SCRIPT.md`.
 7. `npm run encode`: re-encode the MP4s from the existing masters, for example after
-   editing `metadata.ts`.
+   editing `metadata.ts` or `MUSIC` in `render.ts` (optional music bed, faded and
+   loudness-normalized).
 8. `npm run finalize -- <voiceover-export.mp4> <out.mp4> [variant]`: put the same
    metadata on the owner's voiceover export (stream copy, never overwrites) and
    report its loudness.

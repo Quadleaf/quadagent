@@ -76,8 +76,26 @@
    - names or IDs in images;
    - the end card in every variant.
 4. Confirm length and format: `ffmpeg -i out/x.mp4` shows Duration, 1920x1080,
-   30 fps, `bt709` and no audio stream. Its metadata lists only the `metadata.ts`
-   tags (no `encoder`).
+   30 fps, `bt709`, and either no audio stream or the music bed's AAC stream. Its
+   metadata lists only the `metadata.ts` tags (no `encoder`).
+
+## Music bed
+
+`MUSIC` in `render.ts` (`tools/music.ts`) trims the track from `start` to the cut's
+length and fades out over the last `fadeOut` seconds (default 3, the end card). It
+normalizes to -14 LUFS with two-pass loudnorm, and the AAC goes into the same encode
+as the picture. The render fails unless the final MP4 measures within 1 LU of the target
+with true peak at or below -1 dBTP.
+
+- **AAC raises peaks.** On a hot, dense track: +1.5 dB at 192 kbps and +1.1 dB at
+  256 kbps. Hence the bed's -2.5 dBTP default and 256 kbps AAC. If the final check
+  fails, lower `truePeak`; don't skip the check.
+- **ffmpeg's AAC encoder** writes its "Lavc" version into the stream unless
+  `-flags:a +bitexact` is set. `verifyDelivery()` catches it.
+- **ffmpeg 4.4** (the bundled build) loses the channel layout after `aresample`
+  ("Cannot select channel layout"). Restate it with `aformat=channel_layouts=stereo`.
+- Stock tracks are often mastered above 0 dBFS. Measure before choosing `start`; the
+  loudness check covers the result.
 
 ## SCRIPT.md shape
 

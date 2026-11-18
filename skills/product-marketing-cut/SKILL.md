@@ -14,7 +14,8 @@ The approach, proven on a shipped teaser:
    You get perfectly smooth 4K footage regardless of how slow screenshots are.
 2. Edit in **Revideo** (MIT, code-defined). One `timeline.ts` holds every shot,
    camera move, caption and VO line, so marketing revisions are text edits.
-3. Render a ProRes master, then a silent H.264 MP4 per version that carries only the
+3. Render a ProRes master, then an H.264 MP4 per version (silent or with a loudness-
+   normalized music bed) that carries only the
    owner's delivery metadata (title, company, copyright), with tool strings stripped.
 
 `template/` is a working project. Copy it, fill in the TODOs, then follow the steps
@@ -27,8 +28,14 @@ Ask for anything the request does not answer. Each one changed real work last ti
 
 - **Audience-facing names.** Internal codenames must not leak into captions, VO or
   file names. Ask what marketing calls the feature.
-- **Length, size, fps, audio.** The default is 30-40 s, 1920x1080, 30 fps, no audio
-  track. The owner records the VO and lays it over the MP4.
+- **Length, size, fps, audio.** The default is 30-40 s, 1920x1080, 30 fps. Ask about
+  audio. There are three options:
+  - none: the owner lays a voiceover over the silent MP4 (then use `npm run finalize`);
+  - a music bed: set `MUSIC` in `render.ts` (see references/edit.md);
+  - both.
+  Music must be licensed for commercial web use with no attribution, for example CC0
+  (FreePD), Mixkit or the Pixabay license. Pixabay tracks can still draw YouTube
+  Content ID claims. Record the source page and license in the project README.
 - **Versions.** For example "Now Available" and "Coming Soon" end cards. Build
   variants in from the start (render variables), not as copies.
 - **Footage source.** Use one account that holds only data cleared for public display.

@@ -11,6 +11,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
 import { metadataArgs, STRIP_SEI, verifyDelivery } from './delivery.ts';
+import { measureLoudness } from './music.ts';
 
 const [input, output, variant] = process.argv.slice(2);
 if (!input || !output) {
@@ -40,10 +41,7 @@ execFileSync(ffmpeg.path, [
 verifyDelivery(output);
 
 if (hasAudio) {
-  const r = spawnSync(ffmpeg.path, ['-hide_banner', '-nostats', '-i', output, '-vn', '-af', 'ebur128=peak=true', '-f', 'null', '-'], { encoding: 'utf8' }).stderr;
-  const summary = r.slice(r.lastIndexOf('Summary:'));
-  const lufs = Number(/I:\s+(-?[\d.]+) LUFS/.exec(summary)?.[1]);
-  const peak = Number(/Peak:\s+(-?[\d.]+) dBFS/.exec(summary)?.[1]);
+  const { lufs, truePeak: peak } = measureLoudness(output);
   console.log(`loudness: ${lufs} LUFS integrated, true peak ${peak} dBTP`);
   if (!(lufs >= -15 && lufs <= -13)) console.warn('warning: integrated loudness is outside -14 +/- 1 LUFS (social target)');
   if (!(peak <= -1)) console.warn('warning: true peak is above -1 dBTP');
