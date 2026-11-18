@@ -5,7 +5,10 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import ffmpeg from '@ffmpeg-installer/ffmpeg';
 
 export interface MusicBed {
-  file: string; // the track; record its source page and license in the project README
+  file: string; // the downloaded track
+  source: string; // the track's page URL (for Pixabay: https://pixabay.com/music/<slug>-<id>/)
+  license: string; // license name plus anything a dispute needs, e.g. "Pixabay Content License;
+  //                  Content ID registered: download certificate in assets/music/"
   start?: number; // seconds into the track where the cut starts (default 0)
   fadeIn?: number; // seconds (default 0: most tracks start clean)
   fadeOut?: number; // seconds of fade at the end of the cut (default 3)
@@ -44,6 +47,9 @@ export function checkLoudness(file: string, lufsTarget = -14): void {
 /** Writes the normalized bed to outFile and returns it. Fails if the result misses the target. */
 export function buildMusicBed(music: MusicBed, duration: number, outFile: string): string {
   const { start = 0, fadeIn = 0, fadeOut = 3, lufs = -14, truePeak = -2.5 } = music;
+  for (const key of ['source', 'license'] as const) {
+    if (!music[key]?.trim() || music[key].includes('TODO')) throw new Error(`MUSIC.${key} is required: record where the track came from and its license.`);
+  }
   const available = durationOf(music.file) - start;
   if (available < duration) throw new Error(`${music.file}: only ${available.toFixed(1)} s after start=${start}, the cut needs ${duration.toFixed(1)} s`);
   const shape = [

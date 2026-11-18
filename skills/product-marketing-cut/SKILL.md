@@ -33,9 +33,10 @@ Ask for anything the request does not answer. Each one changed real work last ti
   - none: the owner lays a voiceover over the silent MP4 (then use `npm run finalize`);
   - a music bed: set `MUSIC` in `render.ts` (see references/edit.md);
   - both.
-  Music must be licensed for commercial web use with no attribution, for example CC0
-  (FreePD), Mixkit or the Pixabay license. Pixabay tracks can still draw YouTube
-  Content ID claims. Record the source page and license in the project README.
+  For music, default to **Pixabay Music**: commercial use, no attribution required.
+  Follow the sourcing checklist in references/edit.md ("Music sources"), and check
+  whether the track is Content ID registered before it goes to YouTube. `MUSIC` will not
+  render without its `source` URL and `license`.
 - **Versions.** For example "Now Available" and "Coming Soon" end cards. Build
   variants in from the start (render variables), not as copies.
 - **Footage source.** Use one account that holds only data cleared for public display.

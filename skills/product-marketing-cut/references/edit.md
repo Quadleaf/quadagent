@@ -79,6 +79,53 @@
    30 fps, `bt709`, and either no audio stream or the music bed's AAC stream. Its
    metadata lists only the `metadata.ts` tags (no `encoder`).
 
+## Music sources
+
+**Default: Pixabay Music** (https://pixabay.com/music/). Checked against Pixabay's own
+pages on 2026-11-18 (Terms "Last updated: 20 October, 2026"). Re-check if the Terms date
+has changed.
+
+- **No attribution.** "You do not need to credit Pixabay or the contributor of Content
+  when you use it" (Terms s.6). The music FAQ: "Attribution or revenue sharing isn't
+  required."
+- **Commercial and promotional video is allowed.** FAQ: "You may use Pixabay music in
+  commercial video projects ... (such as client videos, promotional materials ...)".
+  Social platforms are explicitly allowed.
+- **Limits that apply to music:**
+  - The track must be embedded in the video ("part of a larger creative work and not
+    distributed as a standalone file"). Never put the MP3 in the deliverables folder or
+    share it separately.
+  - Don't claim ownership or exclusive rights.
+  - Not as part of a trademark, sound logo or business name.
+  - No political or illegal use.
+  - The Terms put responsibility for any other permissions on the user. Pixabay doesn't
+    warrant third-party rights.
+- **Content ID.** Some tracks are registered by their composer or distributor. The track
+  page says "Content ID Registered" (a shield icon in listings). Using one is still
+  licensed, but YouTube may raise an automated claim (not a strike). Facebook and
+  Instagram may mute or match similarly.
+  - Prefer an unregistered track if the cut is going to YouTube.
+  - If you keep a registered one, download its license certificate from the track page
+    (logged in) and keep it with the music.
+  - To dispute: YouTube Studio > Content > See Details > Dispute > "I have permission or
+    a license to use the content". Include the track title, the track URL and
+    https://pixabay.com/service/license-summary/.
+- **Sourcing checklist:**
+  1. Download from pixabay.com itself, not a mirror.
+  2. Keep the original file name; it ends in the track id.
+  3. Put the file in `assets/music/`.
+  4. Set `MUSIC.source` to the track page URL and `MUSIC.license` to the license, plus
+     the Content ID status.
+  5. Record the title, creator, URL, license link with the check date, and the Content
+     ID status in the README.
+  6. Measure the track before choosing `start` (stock tracks are often mastered hot).
+
+Alternatives with no attribution:
+- FreePD: CC0, the cleanest license, but uneven quality.
+- Mixkit: its own free license; web video and ads only, no broadcast.
+
+Avoid free tiers that require a credit line (Incompetech, Bensound, Uppbeat).
+
 ## Music bed
 
 `MUSIC` in `render.ts` (`tools/music.ts`) trims the track from `start` to the cut's

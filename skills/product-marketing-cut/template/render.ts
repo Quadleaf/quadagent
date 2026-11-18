@@ -29,8 +29,10 @@ for (const v of variants) if (!VARIANT_FILES[v]) throw new Error(`Unknown varian
 // Optional music bed: a licensed track trimmed to the cut, faded out at the end and
 // normalized to about -14 LUFS (tools/music.ts). null keeps the MP4 silent, e.g. when the
 // owner adds a voiceover later. Only use tracks whose license allows commercial web use
-// with no attribution, and record the source page and license in README.md.
-const MUSIC: MusicBed | null = null; // e.g. { file: 'assets/music/track.mp3', fadeOut: 3 }
+// with no attribution (see references/edit.md, "Music sources").
+// e.g. { file: 'assets/music/track.mp3', source: 'https://pixabay.com/music/...',
+//        license: 'Pixabay Content License', fadeOut: 3 }
+const MUSIC: MusicBed | null = null;
 if (MUSIC && !existsSync(MUSIC.file)) throw new Error(`${MUSIC.file} not found`);
 const encodeOnly = process.argv.includes('--encode-only');
 // Fail on unfilled metadata.ts now, not after minutes of rendering.
