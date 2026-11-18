@@ -14,7 +14,9 @@ The approach, proven on a shipped teaser:
    You get perfectly smooth 4K footage regardless of how slow screenshots are.
 2. Edit in **Revideo** (MIT, code-defined). One `timeline.ts` holds every shot,
    camera move, caption and VO line, so marketing revisions are text edits.
-3. Render a ProRes master, then a silent H.264 MP4 per version.
+3. Render a ProRes master, then an H.264 MP4 per version (silent or with a loudness-
+   normalized music bed) that carries only the
+   owner's delivery metadata (title, company, copyright), with tool strings stripped.
 
 `template/` is a working project. Copy it, fill in the TODOs, then follow the steps
 below. `references/capture.md` and `references/edit.md` have the technique details
@@ -26,8 +28,15 @@ Ask for anything the request does not answer. Each one changed real work last ti
 
 - **Audience-facing names.** Internal codenames must not leak into captions, VO or
   file names. Ask what marketing calls the feature.
-- **Length, size, fps, audio.** The default is 30-40 s, 1920x1080, 30 fps, no audio
-  track. The owner records the VO and lays it over the MP4.
+- **Length, size, fps, audio.** The default is 30-40 s, 1920x1080, 30 fps. Ask about
+  audio. There are three options:
+  - none: the owner lays a voiceover over the silent MP4 (then use `npm run finalize`);
+  - a music bed: set `MUSIC` in `render.ts` (see references/edit.md);
+  - both.
+  For music, default to **Pixabay Music**: commercial use, no attribution required.
+  Follow the sourcing checklist in references/edit.md ("Music sources"), and check
+  whether the track is Content ID registered before it goes to YouTube. `MUSIC` will not
+  render without its `source` URL and `license`.
 - **Versions.** For example "Now Available" and "Coming Soon" end cards. Build
   variants in from the start (render variables), not as copies.
 - **Footage source.** Use one account that holds only data cleared for public display.
@@ -40,6 +49,10 @@ Ask for anything the request does not answer. Each one changed real work last ti
   company license above a size threshold. Pin exact versions. No system package
   installs: ffmpeg comes from `@ffmpeg-installer`, pulled in by `@revideo/ffmpeg`.
 - **Where deliverables go.** A shared marketing folder, separate from the build project.
+- **Delivery metadata.** Ask for the title, the company's legal name as it should
+  appear publicly (for example "Example, Inc."), the copyright line, a one-line
+  description and a public URL. These go in `metadata.ts`. Don't guess the legal
+  name from the brand name.
 
 ## Hard rules
 
@@ -70,7 +83,7 @@ Ask for anything the request does not answer. Each one changed real work last ti
 
 1. **Scaffold.** Copy `template/` to the project folder and run `npm install` and
    `npx playwright install chromium`.
-   - Fill in `capture/config.ts` and `src/brand.ts`.
+   - Fill in `capture/config.ts`, `src/brand.ts` and `metadata.ts`.
    - Add the brand's logo PNGs and font to `public/brand/`. Sample colors from the
      official logo artwork.
 2. **Session.** Run `npm run login` in the background and ask the owner to log in,
@@ -102,6 +115,19 @@ Ask for anything the request does not answer. Each one changed real work last ti
 8. **Deliver.** Copy the MP4s, SCRIPT.md and 1080p previews of each clip to the
    deliverables folder. Confirm durations with ffprobe. Remove superseded renders you
    made, so nobody posts an old cut.
+   - Every final MP4 carries only the tags in `metadata.ts`. The render strips the
+     encoder tag and the x264 settings block, converts to BT.709 and tags it, writes the
+     index first (faststart), and fails if `verifyDelivery()` finds a tool string or a
+     local path. After changing `metadata.ts`, run `npm run encode` to re-encode from
+     the existing masters; no re-render is needed.
+   - **The owner's voiceover export is a new deliverable.** Editors (iMovie, CapCut,
+     Premiere) write their own title, keywords, a thumbnail image and tool tags. Run
+     `npm run finalize -- <export.mp4> <name>_final.mp4 [variant]`. It stream-copies
+     with the same metadata, never overwrites, and reports loudness (target about
+     -14 LUFS integrated, true peak at or below -1 dBTP; fix it in the editor).
+   - Contact-sheet that export too (references/edit.md), not just your render. The
+     owner's edit can pull in other footage. One edit carried a customer account and
+     a desktop file picker this way, in its embedded thumbnail as well as on screen.
 9. **Report.** List each change against what was asked, the new files, anything
    written to the app (it should be nothing) and every guard exception you added.
    Flag data that looks wrong on camera.

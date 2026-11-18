@@ -13,6 +13,12 @@
   N outputs.
 - **Assets.** `public/` is served at `/`. Fonts must be registered with `FontFace` in
   `project.ts` before the first frame, or the first frames render in a fallback font.
+- **Color.** The ProRes master is untagged, but its RGB to YUV step uses the BT.601
+  matrix. Measured: brand colors decode exactly with BT.601 and drift with BT.709
+  (#008fff showed as #0088ff). Players assume BT.709 for untagged HD. `render.ts`
+  converts the matrix and tags BT.709. If you change the exporter or the Revideo
+  version, re-measure. Decode a flat brand-colored pixel with each matrix:
+  `-vf "crop=2:2:X:Y,scale=1:1:in_color_matrix=bt709:in_range=tv:out_range=pc:flags=neighbor,format=rgb24" -f rawvideo - | xxd -p`
 - **Tooling.** Keep `tsx` for capture and render scripts. Throwaway scripts must live
   inside the project, because `/tmp` can't resolve `node_modules`, and must be ES
   modules (top-level await).
@@ -70,7 +76,73 @@
    - names or IDs in images;
    - the end card in every variant.
 4. Confirm length and format: `ffmpeg -i out/x.mp4` shows Duration, 1920x1080,
-   30 fps and no audio stream.
+   30 fps, `bt709`, and either no audio stream or the music bed's AAC stream. Its
+   metadata lists only the `metadata.ts` tags (no `encoder`).
+
+## Music sources
+
+**Default: Pixabay Music** (https://pixabay.com/music/). Checked against Pixabay's own
+pages on 2026-11-18 (Terms "Last updated: 20 October, 2026"). Re-check if the Terms date
+has changed.
+
+- **No attribution.** "You do not need to credit Pixabay or the contributor of Content
+  when you use it" (Terms s.6). The music FAQ: "Attribution or revenue sharing isn't
+  required."
+- **Commercial and promotional video is allowed.** FAQ: "You may use Pixabay music in
+  commercial video projects ... (such as client videos, promotional materials ...)".
+  Social platforms are explicitly allowed.
+- **Limits that apply to music:**
+  - The track must be embedded in the video ("part of a larger creative work and not
+    distributed as a standalone file"). Never put the MP3 in the deliverables folder or
+    share it separately.
+  - Don't claim ownership or exclusive rights.
+  - Not as part of a trademark, sound logo or business name.
+  - No political or illegal use.
+  - The Terms put responsibility for any other permissions on the user. Pixabay doesn't
+    warrant third-party rights.
+- **Content ID.** Some tracks are registered by their composer or distributor. The track
+  page says "Content ID Registered" (a shield icon in listings). Using one is still
+  licensed, but YouTube may raise an automated claim (not a strike). Facebook and
+  Instagram may mute or match similarly.
+  - Prefer an unregistered track if the cut is going to YouTube.
+  - If you keep a registered one, download its license certificate from the track page
+    (logged in) and keep it with the music.
+  - To dispute: YouTube Studio > Content > See Details > Dispute > "I have permission or
+    a license to use the content". Include the track title, the track URL and
+    https://pixabay.com/service/license-summary/.
+- **Sourcing checklist:**
+  1. Download from pixabay.com itself, not a mirror.
+  2. Keep the original file name; it ends in the track id.
+  3. Put the file in `assets/music/`.
+  4. Set `MUSIC.source` to the track page URL and `MUSIC.license` to the license, plus
+     the Content ID status.
+  5. Record the title, creator, URL, license link with the check date, and the Content
+     ID status in the README.
+  6. Measure the track before choosing `start` (stock tracks are often mastered hot).
+
+Alternatives with no attribution:
+- FreePD: CC0, the cleanest license, but uneven quality.
+- Mixkit: its own free license; web video and ads only, no broadcast.
+
+Avoid free tiers that require a credit line (Incompetech, Bensound, Uppbeat).
+
+## Music bed
+
+`MUSIC` in `render.ts` (`tools/music.ts`) trims the track from `start` to the cut's
+length and fades out over the last `fadeOut` seconds (default 3, the end card). It
+normalizes to -14 LUFS with two-pass loudnorm, and the AAC goes into the same encode
+as the picture. The render fails unless the final MP4 measures within 1 LU of the target
+with true peak at or below -1 dBTP.
+
+- **AAC raises peaks.** On a hot, dense track: +1.5 dB at 192 kbps and +1.1 dB at
+  256 kbps. Hence the bed's -2.5 dBTP default and 256 kbps AAC. If the final check
+  fails, lower `truePeak`; don't skip the check.
+- **ffmpeg's AAC encoder** writes its "Lavc" version into the stream unless
+  `-flags:a +bitexact` is set. `verifyDelivery()` catches it.
+- **ffmpeg 4.4** (the bundled build) loses the channel layout after `aresample`
+  ("Cannot select channel layout"). Restate it with `aformat=channel_layouts=stereo`.
+- Stock tracks are often mastered above 0 dBFS. Measure before choosing `start`; the
+  loudness check covers the result.
 
 ## SCRIPT.md shape
 
