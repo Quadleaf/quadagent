@@ -11,5 +11,5 @@
     "noEmit": true,
     "types": ["node", "vite/client"]
   },
-  "include": ["src", "capture", "render.ts", "tools"]
+  "include": ["src", "capture", "render.ts", "metadata.ts", "tools"]
 }

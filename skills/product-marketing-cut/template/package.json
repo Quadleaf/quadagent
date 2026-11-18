@@ -8,8 +8,10 @@
     "capture": "tsx capture/record.ts",
     "editor": "revideo editor --projectFile ./src/project.ts",
     "render": "tsx render.ts",
+    "encode": "tsx render.ts --encode-only",
     "stills": "tsx render.ts --stills",
-    "script": "tsx tools/script.ts"
+    "script": "tsx tools/script.ts",
+    "finalize": "tsx tools/finalize.ts"
   },
   "devDependencies": {
     "@revideo/2d": "0.11.0",

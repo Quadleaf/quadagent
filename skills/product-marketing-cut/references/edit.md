@@ -13,6 +13,12 @@
   N outputs.
 - **Assets.** `public/` is served at `/`. Fonts must be registered with `FontFace` in
   `project.ts` before the first frame, or the first frames render in a fallback font.
+- **Color.** The ProRes master is untagged, but its RGB to YUV step uses the BT.601
+  matrix. Measured: brand colors decode exactly with BT.601 and drift with BT.709
+  (#008fff showed as #0088ff). Players assume BT.709 for untagged HD. `render.ts`
+  converts the matrix and tags BT.709. If you change the exporter or the Revideo
+  version, re-measure. Decode a flat brand-colored pixel with each matrix:
+  `-vf "crop=2:2:X:Y,scale=1:1:in_color_matrix=bt709:in_range=tv:out_range=pc:flags=neighbor,format=rgb24" -f rawvideo - | xxd -p`
 - **Tooling.** Keep `tsx` for capture and render scripts. Throwaway scripts must live
   inside the project, because `/tmp` can't resolve `node_modules`, and must be ES
   modules (top-level await).
@@ -70,7 +76,8 @@
    - names or IDs in images;
    - the end card in every variant.
 4. Confirm length and format: `ffmpeg -i out/x.mp4` shows Duration, 1920x1080,
-   30 fps and no audio stream.
+   30 fps, `bt709` and no audio stream. Its metadata lists only the `metadata.ts`
+   tags (no `encoder`).
 
 ## SCRIPT.md shape
 
